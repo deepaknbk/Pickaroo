@@ -8,18 +8,12 @@
 </head>
 <body>
   <main class="app">
-  <h1>Pickaroo</h1>
-
-  <div class="question-inline" style="margin-top:10px;border-bottom:1px solid var(--muted);padding-bottom:10px">
-    <label for="qInput" style="display:block;font-weight:600;margin-bottom:6px">Question of the week</label>
-    <div style="display:flex;gap:8px;align-items:center">
-      <input id="qInput" type="text" placeholder="Enter the question of the week" maxlength="250" style="flex:1" />
-      <button id="saveQBtn">Save</button>
-      <button id="clearQBtn">Clear</button>
-    </div>
-    <div id="qDisplay" class="question-display" aria-live="polite" style="margin-top:8px;color:var(--muted)">No question set</div>
+  <!-- header: title + inline question display -->
+  <div class="app-header">
+    <!-- Question of the week replaces the static title and uses the same heading style -->
+    <h1 id="qDisplayValue" class="app-title" aria-live="polite">No question set</h1>
   </div>
-  
+
     <section class="controls">
       <label class="input-row">
         <input id="nameInput" type="text" placeholder="Enter a name and press Add" maxlength="80" />
@@ -53,7 +47,43 @@
 
     <div id="result" class="result" aria-atomic="true"></div>
     <div id="message" class="message" role="status"></div>
+
+    <!-- Question input moved to the bottom of the page -->
+    <div class="question-inline" style="margin-top:18px;border-top:1px solid var(--muted);padding-top:12px">
+      <label for="qInput" style="display:block;font-weight:600;margin-bottom:6px">Question of the week</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="qInput" type="text" placeholder="Enter the question of the week" maxlength="250" style="flex:1" />
+        <button id="saveQBtn">Save</button>
+        <button id="clearQBtn">Clear</button>
+      </div>
+      <small style="color:var(--muted);display:block;margin-top:8px">Saved only when "Persist" is checked</small>
+    </div>
   </main>
+
+  <!-- live-update so qDisplay reflects input immediately -->
+  <script>
+    (function(){
+      const Q_KEY = 'pickaroo:question';
+      const qInput = document.getElementById('qInput');
+      const qValue = document.getElementById('qDisplayValue');
+
+      // init from localStorage (if persisted) or leave default
+      try {
+        const saved = localStorage.getItem(Q_KEY);
+        if (saved) {
+          if (qValue) qValue.textContent = saved;
+          if (qInput) qInput.value = saved;
+        }
+      } catch (e) { /* ignore storage errors */ }
+
+      // live update the header display as user types
+      if (qInput && qValue) {
+        qInput.addEventListener('input', () => {
+          qValue.textContent = qInput.value.trim() || 'No question set';
+        });
+      }
+    })();
+  </script>
 
   <script src="script.js"></script>
 </body>
